@@ -27,12 +27,12 @@ export type FlashcardSource = "ai-full" | "ai-edited" | "manual";
 // Command Model for creating a flashcard
 // Union type to enforce that if the flashcard is created manually, generation_id must be null,
 // and if created via AI, generation_id must be provided and be a number.
-export type CreateFlashcardCommand = {
+export interface CreateFlashcardCommand {
   front: string; // maximum length 200
   back: string; // maximum length 500
   source: FlashcardSource;
   generation_id: number | null;
-};
+}
 
 // Request DTO for POST /flashcards endpoint
 export interface CreateFlashcardsDTO {
