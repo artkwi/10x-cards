@@ -1,15 +1,15 @@
 import { z } from "zod";
 import type { APIRoute } from "astro";
-import type { GenerationResponseDTO } from "../../types";
+import type { CreateGenerationCommand, GenerationResponseDTO } from "@/types";
 import { DEFAULT_USER_ID } from "../../db/supabase.client";
 import { AIGenerationService } from "../../lib/services/ai-generation.service";
 import { GenerationService } from "../../lib/services/generation.service";
 
 // Validation schema for the request body
-const generationSchema = z.object({
+const GenerationSchema = z.object({
   source_text: z
     .string()
-    .min(1000, "Text must be at least 1000 characters long")
+    .min(1000, "Text must be at least 1000 characters")
     .max(10000, "Text must not exceed 10000 characters"),
 });
 
@@ -21,24 +21,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
   let source_text = "";
 
   try {
-    // Validate request body
-    const body = await request.json();
-    const validationResult = generationSchema.safeParse(body);
+    const body = (await request.json()) as CreateGenerationCommand;
+    const validatedData = GenerationSchema.parse(body);
 
-    if (!validationResult.success) {
-      return new Response(
-        JSON.stringify({
-          error: "Validation failed",
-          details: validationResult.error.errors,
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    source_text = validationResult.data.source_text;
+    source_text = validatedData.source_text;
 
     // Generate flashcards using AI service
     const { flashcards, count, duration } = await aiService.generateFlashcards(source_text);
@@ -63,9 +49,31 @@ export const POST: APIRoute = async ({ request, locals }) => {
       await generationService.logGenerationError(DEFAULT_USER_ID, error, source_text);
     }
 
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({
+          error: "Validation error",
+          details: error.errors,
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        error: "Internal server error",
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 };
