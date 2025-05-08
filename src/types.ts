@@ -1,69 +1,119 @@
-// DTO and Command Model definitions for the API
-
-// Import database types from the DB module
+// src/types.ts
 import type { Database } from "./db/database.types";
 
-// ========== Flashcards DTOs ===========
+// ------------------------------------------------------------------------------------------------
+// Aliases for base database types extracted from the Database model definitions
+// ------------------------------------------------------------------------------------------------
+export type Flashcard = Database["public"]["Tables"]["flashcards"]["Row"];
+export type FlashcardInsert = Database["public"]["Tables"]["flashcards"]["Insert"];
+export type Generation = Database["public"]["Tables"]["generations"]["Row"];
+export type GenerationErrorLog = Database["public"]["Tables"]["generation_error_logs"]["Row"];
 
-// Represents a flashcard record, based on the database definition
-export type FlashcardDTO = Database["public"]["Tables"]["flashcards"]["Row"];
+// ------------------------------------------------------------------------------------------------
+// 1. Flashcard DTO
+//    Represents a flashcard as returned by the API endpoints (GET /flashcards, GET /flashcards/{id})
+// ------------------------------------------------------------------------------------------------
+export type FlashcardDto = Pick<
+  Flashcard,
+  "id" | "front" | "back" | "source" | "generation_id" | "created_at" | "updated_at"
+>;
 
-// DTO for pagination information
-export interface PaginationDTO {
+// ------------------------------------------------------------------------------------------------
+// 2. Pagination DTO
+//    Contains pagination details used in list responses
+// ------------------------------------------------------------------------------------------------
+export interface PaginationDto {
   page: number;
   limit: number;
   total: number;
 }
 
-// Response DTO for GET /flashcards endpoint
-export interface FlashcardsResponseDTO {
-  data: FlashcardDTO[];
-  pagination: PaginationDTO;
+// ------------------------------------------------------------------------------------------------
+// 3. Flashcards List Response DTO
+//    Combines an array of flashcards with pagination metadata (GET /flashcards)
+// ------------------------------------------------------------------------------------------------
+export interface FlashcardsListResponseDto {
+  data: FlashcardDto[];
+  pagination: PaginationDto;
 }
 
-// Allowed flashcard sources
-export type FlashcardSource = "ai-full" | "ai-edited" | "manual";
+// ------------------------------------------------------------------------------------------------
+// 4. Flashcard Create DTO & Command Model
+//    Used in the POST /flashcards endpoint to create one or more flashcards.
+//    Validation rules:
+//      - front: maximum length 200 characters
+//      - back: maximum length 500 characters
+//      - source: must be one of "ai-full", "ai-edited", or "manual"
+//      - generation_id: required for "ai-full" and "ai-edited", must be null for "manual"
+// ------------------------------------------------------------------------------------------------
+export type Source = "ai-full" | "ai-edited" | "manual";
 
-// Command Model for creating a flashcard
-// Union type to enforce that if the flashcard is created manually, generation_id must be null,
-// and if created via AI, generation_id must be provided and be a number.
-export interface CreateFlashcardCommand {
-  front: string; // maximum length 200
-  back: string; // maximum length 500
-  source: FlashcardSource;
+export interface FlashcardCreateDto {
+  front: string;
+  back: string;
+  source: Source;
   generation_id: number | null;
 }
 
-// Request DTO for POST /flashcards endpoint
-export interface CreateFlashcardsDTO {
-  flashcards: CreateFlashcardCommand[];
+export interface FlashcardsCreateCommand {
+  flashcards: FlashcardCreateDto[];
 }
 
-// Command Model for updating a flashcard (fields are optional)
-export type UpdateFlashcardCommand = Partial<
-  Pick<Database["public"]["Tables"]["flashcards"]["Update"], "front" | "back" | "source" | "generation_id">
->;
-
-// ========== Generations DTOs ===========
-
-// Command Model for initiating a generation request
-export interface CreateGenerationCommand {
-  source_text: string; // Must be between 1000 and 10000 characters
-}
-
-// DTO for a generated flashcard proposal (as returned in the generation response)
-export interface FlashcardProposalDTO {
+// ------------------------------------------------------------------------------------------------
+// 5. Flashcard Update DTO (Command Model)
+//    For the PUT /flashcards/{id} endpoint to update existing flashcards.
+//    This model is a partial update of flashcard fields.
+// ------------------------------------------------------------------------------------------------
+export type FlashcardUpdateDto = Partial<{
   front: string;
   back: string;
-  source: "ai-full"; // As per API plan, proposals are generated with source 'ai-full'
+  source: "ai-full" | "ai-edited" | "manual";
+  generation_id: number | null;
+}>;
+
+// ------------------------------------------------------------------------------------------------
+// 6. Generate Flashcards Command
+//    Used in the POST /generations endpoint to initiate the AI flashcard generation process.
+//    The "source_text" must be between 1000 and 10000 characters.
+// ------------------------------------------------------------------------------------------------
+export interface GenerateFlashcardsCommand {
+  source_text: string;
 }
 
-// Response DTO for POST /generations endpoint
-export interface GenerationResponseDTO {
+// ------------------------------------------------------------------------------------------------
+// 7. Flashcard Proposal DTO
+//    Represents a single flashcard proposal generated from AI, always with source "ai-full".
+// ------------------------------------------------------------------------------------------------
+export interface FlashcardProposalDto {
+  front: string;
+  back: string;
+  source: "ai-full";
+}
+
+// ------------------------------------------------------------------------------------------------
+// 8. Generation Create Response DTO
+//    This type describes the response from the POST /generations endpoint.
+// ------------------------------------------------------------------------------------------------
+export interface GenerationCreateResponseDto {
   generation_id: number;
-  flashcards_proposals: FlashcardProposalDTO[];
+  flashcards_proposals: FlashcardProposalDto[];
   generated_count: number;
 }
 
-// DTO for a generation record based on the database model
-export type GenerationDTO = Database["public"]["Tables"]["generations"]["Row"];
+// ------------------------------------------------------------------------------------------------
+// 9. Generation Detail DTO
+//    Provides detailed information for a generation request (GET /generations/{id}),
+//    including metadata from the generations table and optionally, the associated flashcards.
+// ------------------------------------------------------------------------------------------------
+export type GenerationDetailDto = Generation & {
+  flashcards?: FlashcardDto[];
+};
+
+// ------------------------------------------------------------------------------------------------
+// 10. Generation Error Log DTO
+//     Represents an error log entry for the AI flashcard generation process (GET /generation-error-logs).
+// ------------------------------------------------------------------------------------------------
+export type GenerationErrorLogDto = Pick<
+  GenerationErrorLog,
+  "id" | "error_code" | "error_message" | "model" | "source_text_hash" | "source_text_length" | "created_at" | "user_id"
+>;

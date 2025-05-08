@@ -1,13 +1,9 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-export type Database = {
+export interface Database {
   graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
+    Tables: Record<never, never>;
+    Views: Record<never, never>;
     Functions: {
       graphql: {
         Args: {
@@ -19,12 +15,8 @@ export type Database = {
         Returns: Json;
       };
     };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
+    Enums: Record<never, never>;
+    CompositeTypes: Record<never, never>;
   };
   public: {
     Tables: {
@@ -61,7 +53,7 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "flashcards_generation_id_fkey";
+            foreignKeyName: "fk_generation";
             columns: ["generation_id"];
             isOneToOne: false;
             referencedRelation: "generations";
@@ -73,7 +65,7 @@ export type Database = {
         Row: {
           created_at: string;
           error_code: string;
-          error_message: string | null;
+          error_message: string;
           id: number;
           model: string;
           source_text_hash: string;
@@ -83,7 +75,7 @@ export type Database = {
         Insert: {
           created_at?: string;
           error_code: string;
-          error_message?: string | null;
+          error_message: string;
           id?: number;
           model: string;
           source_text_hash: string;
@@ -93,7 +85,7 @@ export type Database = {
         Update: {
           created_at?: string;
           error_code?: string;
-          error_message?: string | null;
+          error_message?: string;
           id?: number;
           model?: string;
           source_text_hash?: string;
@@ -145,27 +137,12 @@ export type Database = {
         Relationships: [];
       };
     };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      unaccent: {
-        Args: { "": string };
-        Returns: string;
-      };
-      unaccent_init: {
-        Args: { "": unknown };
-        Returns: unknown;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
+    Views: Record<never, never>;
+    Functions: Record<never, never>;
+    Enums: Record<never, never>;
+    CompositeTypes: Record<never, never>;
   };
-};
+}
 
 type DefaultSchema = Database[Extract<keyof Database, "public">];
 

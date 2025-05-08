@@ -1,72 +1,115 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import type { CreateFlashcardsDTO } from "@/types";
-import { FlashcardService } from "@/lib/services/flashcard.service";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
+import type { FlashcardsCreateCommand } from "../../types";
+import { DEFAULT_USER_ID } from "../../db/supabase.client";
+import { DatabaseError, FlashcardService } from "../../lib/flashcard.service";
 
 export const prerender = false;
 
-const FlashcardSchema = z.object({
-  front: z.string().max(200, "Front side must not exceed 200 characters"),
-  back: z.string().max(500, "Back side must not exceed 500 characters"),
-  source: z.enum(["ai-full", "ai-edited", "manual"]),
-  generation_id: z.number(),
-});
+// Validation schema for individual flashcard
+const flashcardSchema = z
+  .object({
+    front: z.string().max(200, "Front text cannot exceed 200 characters"),
+    back: z.string().max(500, "Back text cannot exceed 500 characters"),
+    source: z.enum(["ai-full", "ai-edited", "manual"] as const),
+    generation_id: z.number().nullable(),
+  })
+  .refine(
+    (data) => {
+      // Validate generation_id based on source
+      if (data.source === "manual" && data.generation_id !== null) {
+        return false;
+      }
+      if ((data.source === "ai-full" || data.source === "ai-edited") && data.generation_id === null) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "generation_id must be null for manual source and non-null for ai-full/ai-edited sources",
+    }
+  );
 
-const CreateFlashcardsSchema = z.object({
-  flashcards: z.array(FlashcardSchema),
+// Validation schema for the entire request body
+const createFlashcardsSchema = z.object({
+  flashcards: z
+    .array(flashcardSchema)
+    .min(1, "At least one flashcard must be provided")
+    .max(100, "Maximum 100 flashcards can be created at once"),
 });
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const flashcardService = new FlashcardService(locals.supabase);
-
   try {
-    const body = (await request.json()) as CreateFlashcardsDTO;
-    const validatedData = CreateFlashcardsSchema.parse(body);
+    // Parse and validate request body
+    const body = await request.json();
+    const validationResult = createFlashcardsSchema.safeParse(body);
 
-    const savedFlashcards = await flashcardService.createFlashcards(DEFAULT_USER_ID, validatedData);
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: `Successfully saved ${savedFlashcards.length} flashcards`,
-        data: savedFlashcards,
-      }),
-      {
-        status: 201,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error) {
-    if (error instanceof z.ZodError) {
+    if (!validationResult.success) {
       return new Response(
         JSON.stringify({
-          error: "Validation error",
-          details: error.errors,
+          error: "Invalid input",
+          details: validationResult.error.errors,
         }),
         {
           status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
 
-    console.error("Error saving flashcards:", error);
+    const command = validationResult.data as FlashcardsCreateCommand;
 
-    return new Response(
-      JSON.stringify({
-        error: "Internal server error",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
+    // Validate that all referenced generation_ids exist
+    const generationIds = command.flashcards.map((f) => f.generation_id).filter((id): id is number => id !== null);
+
+    // Create flashcards using service
+    const flashcardService = new FlashcardService(locals.supabase);
+
+    try {
+      await flashcardService.validateGenerationIds(generationIds);
+    } catch (error) {
+      if (error instanceof DatabaseError) {
+        return new Response(
+          JSON.stringify({
+            error: error.message,
+            details: error.details,
+            code: error.code,
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
-    );
+      throw error;
+    }
+
+    const createdFlashcards = await flashcardService.createBatch(DEFAULT_USER_ID, command.flashcards);
+
+    return new Response(JSON.stringify({ flashcards: createdFlashcards }), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error creating flashcards:", error);
+
+    if (error instanceof DatabaseError) {
+      return new Response(
+        JSON.stringify({
+          error: error.message,
+          details: error.details,
+          code: error.code,
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
