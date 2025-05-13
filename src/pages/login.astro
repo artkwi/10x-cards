@@ -1,0 +1,8 @@
+---
+import AuthLayout from "../layouts/AuthLayout.astro";
+import { AuthContainer } from "../components/auth/AuthContainer";
+---
+
+<AuthLayout title="Login">
+  <AuthContainer client:load />
+</AuthLayout>
