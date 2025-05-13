@@ -1,10 +1,10 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Browser as Przeglądarka
-    participant Middleware as Middleware
-    participant AstroAPI as Astro API
-    participant SupabaseAuth as Supabase Auth
+    participant Browser as "Przeglądarka"
+    participant Middleware as "Middleware"
+    participant AstroAPI as "Astro API"
+    participant SupabaseAuth as "Supabase Auth"
 
     Note over Browser,SupabaseAuth: Proces rejestracji i logowania
 
@@ -16,7 +16,7 @@ sequenceDiagram
         AstroAPI->>SupabaseAuth: Przekazanie danych rejestracyjnych
         SupabaseAuth-->>AstroAPI: Potwierdzenie rejestracji
         AstroAPI-->>Browser: Przekierowanie na stronę logowania z komunikatem sukcesu
-    else Logowanie użytkownika
+    else if Logowanie użytkownika
         Browser->>AstroAPI: Wysłanie formularza logowania
         AstroAPI->>SupabaseAuth: Przekazanie danych logowania
         SupabaseAuth-->>AstroAPI: Token JWT
