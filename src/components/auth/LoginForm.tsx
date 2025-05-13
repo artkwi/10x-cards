@@ -6,7 +6,12 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Label } from "@/components/ui/label";
 import type { LoginFormData } from "@/lib/schemas/auth";
 
-export function LoginForm() {
+interface LoginFormProps {
+  onRegisterClick: () => void;
+  onForgotPasswordClick: () => void;
+}
+
+export function LoginForm({ onRegisterClick, onForgotPasswordClick }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -49,10 +54,6 @@ export function LoginForm() {
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
-
-  const handleForgotPassword = () => {
-    window.location.href = "/reset-password";
-  };
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -97,7 +98,7 @@ export function LoginForm() {
             type="button"
             variant="link"
             className="p-0 h-auto font-normal text-sm"
-            onClick={handleForgotPassword}
+            onClick={onForgotPasswordClick}
             disabled={isLoading}
           >
             Forgot your password?
@@ -107,6 +108,19 @@ export function LoginForm() {
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Logging in..." : "Login"}
+          </Button>
+
+          <div className="relative w-full">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Don't have an account?</span>
+            </div>
+          </div>
+
+          <Button type="button" variant="outline" className="w-full" onClick={onRegisterClick} disabled={isLoading}>
+            Create Account
           </Button>
         </CardFooter>
       </form>

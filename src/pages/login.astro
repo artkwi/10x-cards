@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { LoginForm } from "../components/auth/LoginForm";
+import { AuthContainer } from "../components/auth/AuthContainer";
 import { supabaseClient } from "@/db/supabase.client";
 
 // Przekieruj zalogowanych użytkowników
@@ -14,9 +14,9 @@ if (session) {
 
 <Layout title="Login">
   <main class="container mx-auto py-8 px-4">
-    <h1 class="text-3xl font-bold mb-8">Login to 10x Cards</h1>
+    <h1 class="text-3xl font-bold mb-8">10x Cards</h1>
     <div class="max-w-3xl mx-auto">
-      <LoginForm client:load />
+      <AuthContainer client:load />
     </div>
   </main>
 </Layout>

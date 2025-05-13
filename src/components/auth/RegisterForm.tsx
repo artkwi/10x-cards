@@ -4,43 +4,65 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { GoogleAuthButton } from "./GoogleAuthButton";
+import type { RegisterFormData } from "@/lib/schemas/auth";
 
 interface RegisterFormProps {
-  onSubmit: (email: string, password: string) => void;
+  onLoginClick: () => void;
 }
 
-export function RegisterForm({ onSubmit }: RegisterFormProps) {
+export function RegisterForm({ onLoginClick }: RegisterFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
-      setError("All fields are required");
-      return;
-    }
+    setSuccess(false);
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("Hasła nie są identyczne");
       return;
     }
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
+    setIsLoading(true);
 
-    onSubmit(email, password);
+    try {
+      const formData: RegisterFormData = {
+        email: email.trim(),
+        password: password.trim(),
+      };
+
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Wystąpił błąd podczas rejestracji");
+        return;
+      }
+
+      setSuccess(true);
+
+      // Jeśli mamy sesję, przekieruj na stronę główną
+      if (data.session) {
+        window.location.href = "/generate";
+      }
+    } catch {
+      setError("Wystąpił błąd podczas rejestracji");
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
-  const handleConfirmPasswordChange = (e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value);
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -49,62 +71,89 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={handleEmailChange}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              value={password}
-              onChange={handlePasswordChange}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
-              required
-            />
-          </div>
-
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+          {success ? (
+            <Alert>
+              <AlertDescription>
+                Konto zostało utworzone. Sprawdź swoją skrzynkę email, aby potwierdzić rejestrację.
+              </AlertDescription>
             </Alert>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+            </>
           )}
         </CardContent>
 
         <CardFooter className="flex flex-col gap-4">
-          <Button type="submit" className="w-full">
-            Create Account
-          </Button>
+          {!success && (
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating Account..." : "Create Account"}
+            </Button>
+          )}
+
           <div className="relative w-full">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground">
+                {success ? "Check your email" : "Already have an account?"}
+              </span>
             </div>
           </div>
-          <GoogleAuthButton mode="signup" />
+
+          <Button
+            type="button"
+            variant={success ? "default" : "outline"}
+            className="w-full"
+            onClick={onLoginClick}
+            disabled={isLoading}
+          >
+            {success ? "Back to Login" : "Sign In"}
+          </Button>
         </CardFooter>
       </form>
     </Card>
