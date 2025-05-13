@@ -4,32 +4,55 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { GoogleAuthButton } from "./GoogleAuthButton";
+import type { LoginFormData } from "@/lib/schemas/auth";
 
-interface LoginFormProps {
-  onSubmit: (email: string, password: string) => void;
-  onForgotPassword: () => void;
-}
-
-export function LoginForm({ onSubmit, onForgotPassword }: LoginFormProps) {
+export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
 
-    if (!email.trim() || !password.trim()) {
-      setError("Email and password are required");
-      return;
+    try {
+      const formData: LoginFormData = {
+        email: email.trim(),
+        password: password.trim(),
+      };
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Wystąpił błąd podczas logowania");
+        return;
+      }
+
+      // Przekierowanie po udanym logowaniu
+      window.location.href = "/generate";
+    } catch {
+      setError("Wystąpił błąd podczas logowania");
+    } finally {
+      setIsLoading(false);
     }
-
-    onSubmit(email, password);
   };
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
+
+  const handleForgotPassword = () => {
+    window.location.href = "/reset-password";
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -47,6 +70,7 @@ export function LoginForm({ onSubmit, onForgotPassword }: LoginFormProps) {
               value={email}
               onChange={handleEmailChange}
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -59,6 +83,7 @@ export function LoginForm({ onSubmit, onForgotPassword }: LoginFormProps) {
               value={password}
               onChange={handlePasswordChange}
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -68,24 +93,21 @@ export function LoginForm({ onSubmit, onForgotPassword }: LoginFormProps) {
             </Alert>
           )}
 
-          <Button type="button" variant="link" className="p-0 h-auto font-normal text-sm" onClick={onForgotPassword}>
+          <Button
+            type="button"
+            variant="link"
+            className="p-0 h-auto font-normal text-sm"
+            onClick={handleForgotPassword}
+            disabled={isLoading}
+          >
             Forgot your password?
           </Button>
         </CardContent>
 
         <CardFooter className="flex flex-col gap-4">
-          <Button type="submit" className="w-full">
-            Login
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "Login"}
           </Button>
-          <div className="relative w-full">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-          <GoogleAuthButton />
         </CardFooter>
       </form>
     </Card>
