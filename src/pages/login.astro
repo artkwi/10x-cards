@@ -8,7 +8,7 @@ const {
   data: { session },
 } = await supabaseClient.auth.getSession();
 if (session) {
-  return Astro.redirect("/generate");
+  return Astro.redirect("/");
 }
 ---
 

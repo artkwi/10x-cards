@@ -55,7 +55,7 @@ export function RegisterForm({ onLoginClick }: RegisterFormProps) {
 
       // Jeśli mamy sesję, przekieruj na stronę główną
       if (data.session) {
-        window.location.href = "/generate";
+        window.location.href = "/";
       }
     } catch {
       setError("Wystąpił błąd podczas rejestracji");

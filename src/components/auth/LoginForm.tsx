@@ -44,7 +44,7 @@ export function LoginForm({ onRegisterClick, onForgotPasswordClick }: LoginFormP
       }
 
       // Przekierowanie po udanym logowaniu
-      window.location.href = "/generate";
+      window.location.href = "/";
     } catch {
       setError("Wystąpił błąd podczas logowania");
     } finally {
