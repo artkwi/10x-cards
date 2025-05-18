@@ -63,3 +63,17 @@ This MVP version of 10x-cards is under active development. Core functionalities 
 ## License
 
 This project is licensed under the MIT License.
+
+# products
+
+This library was generated with [Nx](https://nx.dev).
+
+## Running unit tests
+
+Run `nx test products` to execute the unit tests.
+
+Unit tests are implemented using Vitest and React Testing Library for fast and robust testing of components and logic.
+
+## Running end-to-end tests
+
+End-to-end tests are executed using Playwright to simulate real user interactions and verify complete application flows.
