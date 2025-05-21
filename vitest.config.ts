@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
-    setupFiles: [], // Możesz dodać pliki setup, np. do custom matchers
+    setupFiles: ["./setupTests.ts"], // Możesz dodać pliki setup, np. do custom matchers
     exclude: [
       "e2e/**", // <-- wyklucza testy Playwrighta
       "node_modules",
