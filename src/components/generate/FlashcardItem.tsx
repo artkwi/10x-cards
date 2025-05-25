@@ -14,7 +14,10 @@ export function FlashcardItem({ flashcard, onAccept, onReject, onEdit }: Flashca
   const isDisabled = flashcard.status !== "pending";
 
   return (
-    <Card className={flashcard.status === "rejected" ? "opacity-50" : undefined}>
+    <Card
+      className={flashcard.status === "rejected" ? "opacity-50" : undefined}
+      data-test-id={`flashcard-item-${flashcard.id}`}
+    >
       <CardContent className="pt-6">
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -34,17 +37,32 @@ export function FlashcardItem({ flashcard, onAccept, onReject, onEdit }: Flashca
           <span className="text-sm text-muted-foreground">Rejected</span>
         ) : (
           <>
-            <Button variant="outline" size="sm" onClick={onEdit} disabled={isDisabled}>
-              <Pencil className="h-4 w-4 mr-1" />
-              Edit
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onEdit}
+              data-test-id={`edit-flashcard-${flashcard.id}`}
+              disabled={isDisabled}
+            >
+              <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm" onClick={onReject} disabled={isDisabled}>
-              <X className="h-4 w-4 mr-1" />
-              Reject
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onReject}
+              data-test-id={`reject-flashcard-${flashcard.id}`}
+              disabled={isDisabled}
+            >
+              <X className="h-4 w-4" />
             </Button>
-            <Button variant="default" size="sm" onClick={onAccept} disabled={isDisabled}>
-              <Check className="h-4 w-4 mr-1" />
-              Accept
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onAccept}
+              data-test-id={`accept-flashcard-${flashcard.id}`}
+              disabled={isDisabled}
+            >
+              <Check className="h-4 w-4" />
             </Button>
           </>
         )}

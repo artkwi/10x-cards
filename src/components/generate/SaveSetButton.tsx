@@ -64,7 +64,14 @@ export function SaveSetButton({ flashcards, generationId, onSaveComplete }: Save
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      <Button onClick={handleSave} disabled={isLoading} className="w-full" variant="default" size="lg">
+      <Button
+        onClick={handleSave}
+        disabled={isLoading}
+        className="w-full"
+        variant="default"
+        size="lg"
+        data-test-id="save-flashcards-button"
+      >
         {isLoading
           ? "Saving..."
           : `Save ${acceptedFlashcards.length} Flashcard${acceptedFlashcards.length === 1 ? "" : "s"}`}

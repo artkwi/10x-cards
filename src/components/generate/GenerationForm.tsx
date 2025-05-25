@@ -34,11 +34,12 @@ export function GenerationForm() {
             placeholder="Enter your text here (minimum 1000 characters, maximum 10000 characters)"
             className="min-h-[200px]"
             disabled={isLoading}
+            data-test-id="flashcard-text-input"
           />
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Characters: {characterCount}</span>
+            <span data-test-id="character-count">Characters: {characterCount}</span>
             {!isValidLength && (
-              <span className="text-destructive">
+              <span className="text-destructive" data-test-id="length-validation-message">
                 {characterCount < 1000
                   ? `${1000 - characterCount} more characters needed`
                   : `${characterCount - 10000} characters over limit`}
@@ -53,7 +54,12 @@ export function GenerationForm() {
           </Alert>
         )}
 
-        <Button type="submit" disabled={!isValidLength || isLoading} className="w-full">
+        <Button
+          type="submit"
+          disabled={!isValidLength || isLoading}
+          className="w-full"
+          data-test-id="generate-flashcards-button"
+        >
           {isLoading ? "Generating..." : "Generate Flashcards"}
         </Button>
       </form>
