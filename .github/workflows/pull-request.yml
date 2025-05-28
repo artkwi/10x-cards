@@ -8,7 +8,7 @@ on:
 jobs:
   lint:
     name: Lint Code
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
 
   test:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: [lint]
     steps:
       - name: Checkout repository
@@ -54,7 +54,7 @@ jobs:
 
   status-comment:
     name: PUpdate PR Statue
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: [test]
     if: always()
     steps:
