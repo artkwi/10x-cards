@@ -1,6 +1,6 @@
 # 10x-cards
 
-## Project description
+## Project description 
 
 10x-cards is a web-based MVP application designed to simplify and accelerate the creation of educational flashcards. The application leverages artificial intelligence to generate flashcards from a given text, as well as enabling the manual creation of flashcards. Users can manage their flashcards by grouping them into sets and utilizing an integrated spaced repetition algorithm for efficient learning. User accounts ensure secure data storage and progress tracking.
 
