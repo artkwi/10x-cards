@@ -64,7 +64,7 @@ This MVP version of 10x-cards is under active development. Core functionalities 
 
 This project is licensed under the MIT License.
 
-# products
+# products 
 
 This library was generated with [Nx](https://nx.dev).
 
