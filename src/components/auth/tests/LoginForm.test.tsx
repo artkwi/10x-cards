@@ -41,8 +41,10 @@ describe("LoginForm", () => {
       ok: true,
       json: async () => ({}),
     });
-    delete window.location;
-    window.location = { href: "" } as any;
+    Object.defineProperty(window, "location", {
+      value: { href: "" },
+      writable: true,
+    });
     render(<LoginForm onRegisterClick={vi.fn()} onForgotPasswordClick={vi.fn()} />);
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "correctpass" } });

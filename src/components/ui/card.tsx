@@ -11,6 +11,7 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(({ className, ...
 ));
 
 const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(({ className, ...props }, ref) => (
+  // eslint-disable-next-line jsx-a11y/heading-has-content
   <h3 ref={ref} className={cn("text-2xl font-semibold leading-none tracking-tight", className)} {...props} />
 ));
 

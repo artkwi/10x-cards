@@ -21,6 +21,7 @@ export interface RequestPayload {
   model: string;
   response_format?: {
     type: "json_schema";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     json_schema: any;
   };
   temperature?: number;

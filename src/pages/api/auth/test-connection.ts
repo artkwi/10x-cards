@@ -18,7 +18,7 @@ export const GET: APIRoute = async () => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err) {
+  } catch {
     return new Response(JSON.stringify({ error: "Failed to connect to Supabase" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

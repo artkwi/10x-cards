@@ -32,25 +32,10 @@ const viewConfigs: Record<AuthView, ViewConfig> = {
 
 export function AuthContainer() {
   const [view, setView] = useState<AuthView>("login");
-  const [resetToken, setResetToken] = useState<string | null>(null);
+  const [resetToken] = useState<string | null>(null);
 
   const handleViewChange = (newView: AuthView) => {
     setView(newView);
-  };
-
-  const handleLogin = (email: string, password: string) => {
-    // Will be handled by Supabase integration
-    console.log("Login:", email, password);
-  };
-
-  const handleRegister = (email: string, password: string) => {
-    // Will be handled by Supabase integration
-    console.log("Register:", email, password);
-  };
-
-  const handleResetRequest = (email: string) => {
-    // Will be handled by Supabase integration
-    console.log("Reset request:", email);
   };
 
   const handleSetNewPassword = (password: string) => {

@@ -115,7 +115,7 @@ export function LoginForm({ onRegisterClick, onForgotPasswordClick }: LoginFormP
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Don't have an account?</span>
+              <span className="bg-background px-2 text-muted-foreground">Don&apos;t have an account?</span>
             </div>
           </div>
 
