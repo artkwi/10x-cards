@@ -11,7 +11,7 @@
 - **AI Integration:** Openrouter.ai for communication with various AI models
 - **CI/CD & Hosting:** GitHub Actions, DigitalOcean
 
-## Getting started locally
+## Getting started locally 
 
 1. **Clone the repository**
 
