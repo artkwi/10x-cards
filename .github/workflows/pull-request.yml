@@ -111,7 +111,7 @@ jobs:
             });
 
       - name: Create failure comment
-        if: ${{ needs.lint.result != 'success' || needs.test.result != 'success' }}
+        if: needs.lint.result != 'success' || needs.test.result != 'success'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
