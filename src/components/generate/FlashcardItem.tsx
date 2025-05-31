@@ -39,7 +39,6 @@ export function FlashcardItem({ flashcard, onAccept, onReject, onEdit }: Flashca
           <>
             <Button
               variant="outline"
-              size="icon"
               onClick={onEdit}
               data-test-id={`edit-flashcard-${flashcard.id}`}
               disabled={isDisabled}
@@ -48,7 +47,6 @@ export function FlashcardItem({ flashcard, onAccept, onReject, onEdit }: Flashca
             </Button>
             <Button
               variant="outline"
-              size="icon"
               onClick={onReject}
               data-test-id={`reject-flashcard-${flashcard.id}`}
               disabled={isDisabled}
@@ -57,7 +55,6 @@ export function FlashcardItem({ flashcard, onAccept, onReject, onEdit }: Flashca
             </Button>
             <Button
               variant="outline"
-              size="icon"
               onClick={onAccept}
               data-test-id={`accept-flashcard-${flashcard.id}`}
               disabled={isDisabled}

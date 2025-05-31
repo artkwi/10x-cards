@@ -70,7 +70,7 @@ export function GenerationForm() {
             flashcards={flashcards}
             onAccept={handleAccept}
             onReject={handleReject}
-            onEdit={handleEdit}
+            onEdit={(card) => card && handleEdit(card)}
             onEditComplete={handleEditComplete}
             editingCard={editingCard}
           />

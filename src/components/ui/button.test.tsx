@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { Button } from "./button";
+import { describe, expect, it } from "vitest";
 
 describe("Button", () => {
   it("renders with default variant", () => {
