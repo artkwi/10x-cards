@@ -50,12 +50,10 @@ jobs:
     permissions:
       contents: read
       deployments: write
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    environment:
+      name: production
+      url: ${{ steps.deployment.outputs.url }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -69,7 +67,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create .env for wrangler
+        run: |
+          echo "CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }}" >> .env
+
       - name: Build project
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
