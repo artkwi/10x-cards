@@ -43,7 +43,7 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test
 
-   deploy:
+  deploy:
     name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
     needs: [test]
