@@ -16,6 +16,7 @@ export default defineConfig({
   server: { port: 3000 },
   vite: {
     plugins: [tailwindcss()],
+    envPrefix: ["SUPABASE_", "PUBLIC_"],
     resolve: {
       alias: import.meta.env.PROD
         ? {
