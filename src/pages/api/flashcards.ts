@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import type { FlashcardsCreateCommand } from "../../types";
-import { DEFAULT_USER_ID } from "../../db/supabase.client";
 import { DatabaseError, FlashcardService } from "../../lib/flashcard.service";
 
 export const prerender = false;
@@ -40,6 +39,20 @@ const createFlashcardsSchema = z.object({
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Check if user is authenticated
+    if (!locals.userId) {
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          details: "User must be authenticated to create flashcards",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Parse and validate request body
     const body = await request.json();
     const validationResult = createFlashcardsSchema.safeParse(body);
@@ -84,7 +97,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       throw error;
     }
 
-    const createdFlashcards = await flashcardService.createBatch(DEFAULT_USER_ID, command.flashcards);
+    const createdFlashcards = await flashcardService.createBatch(locals.userId, command.flashcards);
 
     return new Response(JSON.stringify({ flashcards: createdFlashcards }), {
       status: 201,

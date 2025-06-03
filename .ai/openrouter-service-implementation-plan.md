@@ -63,7 +63,7 @@ Konstruktor usługi `OpenRouterService` odpowiada za inicjalizację wszystkich k
 - `baseUrl`: Bazowy URL endpointu OpenRouter API.
 - `defaultSystemMessage`: Domyślny komunikat systemowy (np. "Jesteś pomocnym asystentem AI, którego zadaniem jest wspierać użytkownika w rozwiązywaniu problemów.")
 - `defaultUserMessage`: Domyślny komunikat użytkownika (np. "Proszę podaj pomocne informacje dotyczące konfiguracji API.")
-- `defaultModel`: Obiekt konfiguracyjny zawierający nazwę modelu i parametry, np. `{ modelName: "gpt-4", modelParameters: { temperature: 0.2, max_tokens: 1500 } }`
+- `defaultModel`: Obiekt konfiguracyjny zawierający nazwę modelu i parametry, np. `{ modelName: "google/gemini-2.0-flash-exp:free", modelParameters: { temperature: 0.2, max_tokens: 1500 } }`
 - Opcjonalnie, konfigurację timeout oraz retry attempts do obsługi błędów sieciowych.
 
 Podczas konstrukcji inicjalizowane są wewnętrzne komponenty, takie jak builder payload, API client oraz mechanizmy walidacji i logowania błędów.
@@ -87,7 +87,7 @@ Podczas konstrukcji inicjalizowane są wewnętrzne komponenty, takie jak builder
 - `baseUrl`: Bazowy URL endpointu API.
 - `defaultSystemMessage`: Domyślny komunikat systemowy wysyłany do modelu.
 - `defaultUserMessage`: Domyślny komunikat użytkownika.
-- `defaultModel`: Obiekt zawierający domyślną nazwę modelu oraz parametry (np. `{ modelName: "gpt-4o-mini", modelParameters: { temperature: 0.2, max_tokens: 1500 } }`).
+- `defaultModel`: Obiekt zawierający domyślną nazwę modelu oraz parametry (np. `{ modelName: "google/gemini-2.0-flash-exp:free", modelParameters: { temperature: 0.2, max_tokens: 1500 } }`).
 
 ### Przykłady konfiguracji:
 
@@ -104,7 +104,7 @@ Podczas konstrukcji inicjalizowane są wewnętrzne komponenty, takie jak builder
     }
   }
   ```
-- **Model name**: "gpt-4o-mini"
+- **Model name**: "google/gemini-2.0-flash-exp:free"
 - **Model parameters**: `{ "temperature": 0.2, "max_tokens": 1500 }`
 
 ## 4. Prywatne metody i pola
