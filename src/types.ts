@@ -1,5 +1,6 @@
 // src/types.ts
 import type { Database } from "./db/database.types";
+import type { SupabaseClient } from "./db/supabase.client";
 
 // ------------------------------------------------------------------------------------------------
 // Aliases for base database types extracted from the Database model definitions
@@ -117,3 +118,14 @@ export type GenerationErrorLogDto = Pick<
   GenerationErrorLog,
   "id" | "error_code" | "error_message" | "model" | "source_text_hash" | "source_text_length" | "created_at" | "user_id"
 >;
+
+// ------------------------------------------------------------------------------------------------
+// 11. Astro Locals Type
+//     Defines the type for Astro's locals object used in API routes
+// ------------------------------------------------------------------------------------------------
+export interface Locals {
+  user: {
+    id: string;
+  };
+  supabase: SupabaseClient;
+}

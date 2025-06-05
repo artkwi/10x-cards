@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import type { FlashcardProposalDto, GenerationCreateResponseDto } from "../types";
+import type { FlashcardProposalDto, GenerationCreateResponseDto, GenerationDetailDto, PaginationDto } from "../types";
 import type { SupabaseClient } from "../db/supabase.client";
 import { OpenRouterService } from "./openrouter.service";
 import { OpenRouterError } from "./openrouter.types";
@@ -162,5 +162,80 @@ Focus on important facts, definitions, concepts, and relationships.`);
       source_text_hash: data.sourceTextHash,
       source_text_length: data.sourceTextLength,
     });
+  }
+
+  // New methods for fetching generations
+  async getGenerations(
+    page = 1,
+    limit = 10
+  ): Promise<{
+    data: GenerationDetailDto[];
+    pagination: PaginationDto;
+  }> {
+    // Calculate offset
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    const { count, error: countError } = await this.supabase
+      .from("generations")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", this.userId);
+
+    if (countError) throw countError;
+
+    // Get generations with pagination
+    const { data: generations, error } = await this.supabase
+      .from("generations")
+      .select("*")
+      .eq("user_id", this.userId)
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+
+    // Get flashcards for each generation
+    const generationsWithFlashcards = await Promise.all(
+      generations.map(async (generation) => {
+        const { data: flashcards } = await this.supabase
+          .from("flashcards")
+          .select("*")
+          .eq("generation_id", generation.id);
+
+        return {
+          ...generation,
+          flashcards: flashcards || [],
+        };
+      })
+    );
+
+    return {
+      data: generationsWithFlashcards,
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+      },
+    };
+  }
+
+  async getGenerationById(id: number): Promise<GenerationDetailDto> {
+    // Get generation
+    const { data: generation, error } = await this.supabase
+      .from("generations")
+      .select("*")
+      .eq("id", id)
+      .eq("user_id", this.userId)
+      .single();
+
+    if (error) throw error;
+    if (!generation) throw new Error("Generation not found");
+
+    // Get flashcards
+    const { data: flashcards } = await this.supabase.from("flashcards").select("*").eq("generation_id", id);
+
+    return {
+      ...generation,
+      flashcards: flashcards || [],
+    };
   }
 }
