@@ -3,6 +3,8 @@ import { z } from "zod";
 import { GenerationService } from "../../../lib/generation.service";
 import type { Locals } from "../../../types";
 
+export const prerender = false;
+
 /**
  * GET /generations/{id}
  *
@@ -44,13 +46,7 @@ const paramsSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
 
-export const GET: APIRoute = async ({
-  params,
-  locals,
-}: {
-  params: Record<string, string | undefined>;
-  locals: Locals;
-}) => {
+export const GET = (async ({ params, locals }) => {
   try {
     // Validate path parameters
     const { id } = paramsSchema.parse(params);
@@ -97,4 +93,4 @@ export const GET: APIRoute = async ({
       },
     });
   }
-};
+}) satisfies APIRoute;

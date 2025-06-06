@@ -3,6 +3,8 @@ import { z } from "zod";
 import { GenerationService } from "../../../lib/generation.service";
 import type { Locals } from "../../../types";
 
+export const prerender = false;
+
 /**
  * GET /generations
  *
@@ -52,7 +54,7 @@ const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(10),
 });
 
-export const GET: APIRoute = async ({ request, locals }: { request: Request; locals: Locals }) => {
+export const GET = (async ({ request, locals }) => {
   try {
     // Get query parameters
     const url = new URL(request.url);
@@ -94,4 +96,4 @@ export const GET: APIRoute = async ({ request, locals }: { request: Request; loc
       },
     });
   }
-};
+}) satisfies APIRoute;
