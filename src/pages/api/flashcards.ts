@@ -40,7 +40,7 @@ const createFlashcardsSchema = z.object({
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     // Check if user is authenticated
-    if (!locals.userId) {
+    if (!locals.user) {
       return new Response(
         JSON.stringify({
           error: "Unauthorized",
@@ -97,7 +97,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       throw error;
     }
 
-    const createdFlashcards = await flashcardService.createBatch(locals.userId, command.flashcards);
+    const createdFlashcards = await flashcardService.createBatch(locals.user.id, command.flashcards);
 
     return new Response(JSON.stringify({ flashcards: createdFlashcards }), {
       status: 201,
