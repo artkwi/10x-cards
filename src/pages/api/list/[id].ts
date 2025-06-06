@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { GenerationService } from "../../../lib/generation.service";
-import type { Locals } from "../../../types";
 
 export const prerender = false;
 
