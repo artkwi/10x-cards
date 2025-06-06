@@ -30,7 +30,7 @@ export const POST: APIRoute = async ({ request }) => {
       email,
       password,
       options: {
-        emailRedirectTo: `${new URL(request.url).origin}/login`,
+        emailRedirectTo: `${new URL(request.url).origin}/`,
       },
     });
 

@@ -20,7 +20,7 @@ export function Navigation() {
 
       if (response.ok) {
         // Przekieruj do strony logowania
-        window.location.href = "/login";
+        window.location.href = "/";
       }
     } catch (error) {
       console.error("Logout failed:", error);

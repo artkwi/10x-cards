@@ -1,13 +1,22 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { GenerationForm } from "../components/generate/GenerationForm";
+import { AuthContainer } from "../components/auth/AuthContainer";
+import { supabaseClient } from "@/db/supabase.client";
+
+// Przekieruj zalogowanych użytkowników
+const {
+  data: { session },
+} = await supabaseClient.auth.getSession();
+if (session) {
+  return Astro.redirect("/generation");
+}
 ---
 
-<Layout title="Generate Flashcards">
+<Layout title="Login">
   <main class="container mx-auto py-8 px-4">
-    <h1 class="text-3xl font-bold mb-8">Generate Flashcards</h1>
+    <h1 class="text-3xl font-bold mb-8">10x Cards</h1>
     <div class="max-w-3xl mx-auto">
-      <GenerationForm client:load />
+      <AuthContainer client:load />
     </div>
   </main>
 </Layout>

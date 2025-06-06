@@ -9,7 +9,7 @@ interface Props {
 
 const { title = "10x Cards", showNavigation = true } = Astro.props;
 const pathname = new URL(Astro.request.url).pathname;
-const isLoginPage = pathname === "/login";
+const isLoginPage = pathname === "/";
 
 // Don't show navigation on login page
 const shouldShowNavigation = showNavigation && !isLoginPage;
